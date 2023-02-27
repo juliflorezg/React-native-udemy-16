@@ -1,6 +1,12 @@
 import React from 'react';
-import {View, Text} from 'react-native';
-import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import {View, Text, StyleSheet, Button, Platform} from 'react-native';
+import {
+  check,
+  request,
+  PERMISSIONS,
+  RESULTS,
+  PermissionStatus,
+} from 'react-native-permissions';
 
 export const PermissionsScreen = () => {
   // Los permisos no son 100% necesarios ya que si el usuario no concede permiso para el GPS, podemos obtener la localización usando la IP, pero esto crea un margen de error muy grande
@@ -50,9 +56,31 @@ export const PermissionsScreen = () => {
     })
     .catch(console.log);
 
+  const checkLocationPermission = async () => {
+    let permissionStatus: PermissionStatus;
+    if (Platform.OS === 'ios') {
+      permissionStatus = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+    } else {
+      permissionStatus = await request(
+        PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      );
+    }
+
+    console.log({permissionStatus});
+  };
+
   return (
-    <View>
+    <View style={styles.container}>
       <Text>PermissionsScreen</Text>
+      <Button title="GPS" onPress={checkLocationPermission} />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
